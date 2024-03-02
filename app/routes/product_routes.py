@@ -10,7 +10,7 @@ product_bp = Blueprint('product_bp', __name__)
 def create_product():
     data = request.get_json()
 
-    required_fields = ['name', 'description', 'price', 'stock_quantity', 'category_id']
+    required_fields = ['name', 'description', 'price', 'stock_quantity', 'image_url', 'category_id']
     missing_fields = [field for field in required_fields if field not in data]
 
     if missing_fields:
@@ -22,6 +22,7 @@ def create_product():
             description=data['description'],
             price=data['price'],
             stock_quantity=data['stock_quantity'],
+            image_url=data['image_url'],
             category_id=data['category_id'],
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow()
@@ -76,7 +77,8 @@ def product_to_dict(product):
         'description': product.description,
         'price': product.price,
         'stock_quantity': product.stock_quantity,
-        'category_id': product.category_id
+        'category_id': product.category_id,
+        'image_url': product.image_url
     }
 
 # Dynamically add the serialization method to Product class
