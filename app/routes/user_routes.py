@@ -3,20 +3,27 @@ from werkzeug.security import generate_password_hash
 from app import db
 from app.models.user import User
 from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 user_bp = Blueprint('user_bp', __name__)
 
 @user_bp.route('/', methods=['POST'])
+@jwt_required()
 def create_user():
     data = request.get_json()
-
-    # Check if email address already exists
-    existing_user = User.query.filter_by(email=data['email']).first()
+    
+    if not data or 'email' not in data or 'password' not in data:
+        return jsonify({'error': 'Email and password are required'}), 400
+    
+    email = data['email']
+    
+    existing_user = User.query.filter_by(email=email).first()
     if existing_user:
         return jsonify({'error': 'Email address already in use'}), 400
 
     try:
-        user = User(name=data['name'], email=data['email'], password_hash=data['password_hash'])
+        hashed_password = generate_password_hash(data['password'], method='sha256')  # Hash the password
+        user = User(name=data['name'], email=email, password_hash=hashed_password)
         db.session.add(user)
         db.session.commit()
         return jsonify(user.to_dict()), 201
@@ -26,6 +33,7 @@ def create_user():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
 
 
 @user_bp.route('/', methods=['GET'])
@@ -39,6 +47,7 @@ def get_user(user_id):
     return jsonify(user.to_dict()), 200
 
 @user_bp.route('/<int:user_id>', methods=['PUT'])
+@jwt_required()
 def update_user(user_id):
     user = User.query.get_or_404(user_id)
     data = request.get_json()
@@ -53,6 +62,7 @@ def update_user(user_id):
     return jsonify(user.to_dict()), 200
 
 @user_bp.route('/<int:user_id>', methods=['DELETE'])
+@jwt_required()
 def delete_user(user_id):
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
