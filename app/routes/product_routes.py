@@ -68,8 +68,6 @@ def delete_product(id):
     db.session.commit()
     return jsonify({'message': 'Product deleted successfully'}), 200
 
-# Assuming you have a to_dict method in your Product model for serialization
-# If not, you'll need to implement it, like so:
 def product_to_dict(product):
     return {
         'id': product.id,
@@ -78,8 +76,8 @@ def product_to_dict(product):
         'price': product.price,
         'stock_quantity': product.stock_quantity,
         'category_id': product.category_id,
-        'image_url': product.image_url
+        'image_url': product.image_url,
+        'reviews': [review.to_dict() for review in product.reviews]
     }
 
-# Dynamically add the serialization method to Product class
 Product.to_dict = product_to_dict
