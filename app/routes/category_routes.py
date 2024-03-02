@@ -7,10 +7,24 @@ category_bp = Blueprint('category_bp', __name__)
 @category_bp.route('/', methods=['POST'])
 def create_category():
     data = request.get_json()
-    new_category = Category(name=data['name'], description=data['description'])
+    existing_category = Category.query.filter_by(name=data['name']).first()
+    
+    if existing_category:
+        return jsonify({'error': 'Category with this name already exists'}), 400
+
+    new_category = Category(
+        name=data['name'],
+        description=data['description'],
+        image_url=data.get('image_url', '')
+    )
     db.session.add(new_category)
-    db.session.commit()
-    return jsonify(new_category.to_dict()), 201
+    try:
+        db.session.commit()
+        return jsonify(new_category.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 
 # Get all categories
 @category_bp.route('/', methods=['GET'])
@@ -31,6 +45,7 @@ def update_category(id):
     data = request.get_json()
     category.name = data.get('name', category.name)
     category.description = data.get('description', category.description)
+    category.image_url = data.get('image_url', category.image_url) 
     db.session.commit()
     return jsonify(category.to_dict()), 200
 
@@ -42,14 +57,13 @@ def delete_category(id):
     db.session.commit()
     return jsonify({'message': 'Category deleted successfully'}), 200
 
-# Assuming you have a to_dict method in your Category model for serialization
-# If not, you'll need to implement it, like so:
 def category_to_dict(category):
     return {
         'id': category.id,
         'name': category.name,
-        'description': category.description
+        'description': category.description,
+        'image_url': category.image_url,
+        "products": [product.to_dict() for product in category.products]
     }
 
-# Dynamically add the serialization method to Category class
 Category.to_dict = category_to_dict
