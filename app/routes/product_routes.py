@@ -40,6 +40,7 @@ def create_product():
 
 # Get all products
 @product_bp.route('/', methods=['GET'])
+@jwt_required()
 def get_products():
     category_name = request.args.get('category')
     if category_name:
@@ -51,6 +52,7 @@ def get_products():
 
 # Get a single product by ID
 @product_bp.route('/<int:id>', methods=['GET'])
+@jwt_required()
 def get_product(id):
     product = Product.query.get_or_404(id)
     return jsonify(product.to_dict()), 200

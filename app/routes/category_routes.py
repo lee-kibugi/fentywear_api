@@ -30,12 +30,14 @@ def create_category():
 
 # Get all categories
 @category_bp.route('/', methods=['GET'])
+@jwt_required()
 def get_categories():
     categories = Category.query.all()
     return jsonify([category.to_dict() for category in categories]), 200
 
 # Get a single category by ID
 @category_bp.route('/<int:id>', methods=['GET'])
+@jwt_required()
 def get_category(id):
     category = Category.query.get_or_404(id)
     return jsonify(category.to_dict()), 200
