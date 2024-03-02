@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app import db
 from app.models.product import Product
+from app.models.category import Category
 from datetime import datetime
 
 product_bp = Blueprint('product_bp', __name__)
@@ -38,7 +39,12 @@ def create_product():
 # Get all products
 @product_bp.route('/', methods=['GET'])
 def get_products():
-    products = Product.query.all()
+    category_name = request.args.get('category')
+    if category_name:
+        products = Product.query.join(Category).filter(Category.name == category_name).all()
+    else:
+        products = Product.query.all()
+    
     return jsonify([product.to_dict() for product in products]), 200
 
 # Get a single product by ID
@@ -76,6 +82,7 @@ def product_to_dict(product):
         'price': product.price,
         'stock_quantity': product.stock_quantity,
         'category_id': product.category_id,
+        'category_name': product.category.name if product.category else None,
         'image_url': product.image_url,
         'reviews': [review.to_dict() for review in product.reviews]
     }
