@@ -63,6 +63,12 @@ def delete_category(id):
     db.session.commit()
     return jsonify({'message': 'Category deleted successfully'}), 200
 
+@category_bp.route('/categories', methods=['OPTIONS'])
+def categories_options():
+    return '', 200
+
+
+
 def category_to_dict(category):
     return {
         'id': category.id,

@@ -13,7 +13,7 @@ login_manager = LoginManager()
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:5173"}})
+    CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:5173"}}, expose_headers=["Authorization"], allow_headers=["Authorization", "Content-Type"])
     db.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
