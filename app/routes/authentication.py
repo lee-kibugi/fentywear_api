@@ -4,15 +4,11 @@ from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from ..models import User
-from .. import db, login_manager
+from flask import Flask
 
-auth_bp = Blueprint('auth_bp', __name__)
+app = Flask(__name__)
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-@auth_bp.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     if not data or not data.get('email') or not data.get('password'):
@@ -25,7 +21,6 @@ def login():
     else:
         return jsonify({'error': 'Invalid email or password'}), 401
 
-@auth_bp.route('/logout', methods=['POST'])
 @jwt_required()
 def logout():
     logout_user()

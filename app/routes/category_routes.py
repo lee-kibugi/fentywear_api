@@ -1,11 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import request, jsonify
 from app import db
 from app.models.category import Category
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-category_bp = Blueprint('category_bp', __name__)
-
-@category_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_category():
     data = request.get_json()
@@ -29,21 +26,18 @@ def create_category():
 
 
 # Get all categories
-@category_bp.route('/', methods=['GET'])
 @jwt_required()
 def get_categories():
     categories = Category.query.all()
     return jsonify([category.to_dict() for category in categories]), 200
 
 # Get a single category by ID
-@category_bp.route('/<int:id>', methods=['GET'])
 @jwt_required()
 def get_category(id):
     category = Category.query.get_or_404(id)
     return jsonify(category.to_dict()), 200
 
 # Update a category
-@category_bp.route('/<int:id>', methods=['PUT'])
 @jwt_required()
 def update_category(id):
     category = Category.query.get_or_404(id)
@@ -55,18 +49,12 @@ def update_category(id):
     return jsonify(category.to_dict()), 200
 
 # Delete a category
-@category_bp.route('/<int:id>', methods=['DELETE'])
 @jwt_required()
 def delete_category(id):
     category = Category.query.get_or_404(id)
     db.session.delete(category)
     db.session.commit()
     return jsonify({'message': 'Category deleted successfully'}), 200
-
-@category_bp.route('/categories', methods=['OPTIONS'])
-def categories_options():
-    return '', 200
-
 
 
 def category_to_dict(category):

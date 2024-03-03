@@ -5,9 +5,7 @@ from app.models.user import User
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-user_bp = Blueprint('user_bp', __name__)
 
-@user_bp.route('/', methods=['POST'])
 def create_user():
     data = request.get_json()
     
@@ -34,20 +32,16 @@ def create_user():
         return jsonify({'error': str(e)}), 500
 
 
-
-@user_bp.route('/', methods=['GET'])
 @jwt_required()
 def get_users():
     users = User.query.all()
     return jsonify([user.to_dict() for user in users]), 200
 
-@user_bp.route('/<int:user_id>', methods=['GET'])
 @jwt_required()
 def get_user(user_id):
     user = User.query.get_or_404(user_id)
     return jsonify(user.to_dict()), 200
 
-@user_bp.route('/<int:user_id>', methods=['PUT'])
 @jwt_required()
 def update_user(user_id):
     user = User.query.get_or_404(user_id)
@@ -62,7 +56,6 @@ def update_user(user_id):
     db.session.commit()
     return jsonify(user.to_dict()), 200
 
-@user_bp.route('/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_user(user_id):
     user = User.query.get_or_404(user_id)
