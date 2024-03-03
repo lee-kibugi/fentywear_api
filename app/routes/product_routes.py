@@ -47,7 +47,7 @@ def get_products():
     return jsonify([product.to_dict() for product in products]), 200
 
 # Get a single product by ID
-@jwt_required()
+
 def get_product(id):
     product = Product.query.get_or_404(id)
     return jsonify(product.to_dict()), 200
