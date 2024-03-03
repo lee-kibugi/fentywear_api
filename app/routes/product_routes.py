@@ -62,6 +62,7 @@ def update_product(id):
     product.price = data.get('price', product.price)
     product.stock_quantity = data.get('stock_quantity', product.stock_quantity)
     product.category_id = data.get('category_id', product.category_id)
+    product.image_url = data.get('image_url', product.image_url)
     db.session.commit()
     return jsonify(product.to_dict()), 200
 
