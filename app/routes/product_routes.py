@@ -37,7 +37,6 @@ def create_product():
 
 
 # Get all products
-@jwt_required()
 def get_products():
     category_name = request.args.get('category')
     if category_name:

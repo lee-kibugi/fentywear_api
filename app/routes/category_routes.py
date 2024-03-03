@@ -26,7 +26,6 @@ def create_category():
 
 
 # Get all categories
-@jwt_required()
 def get_categories():
     categories = Category.query.all()
     return jsonify([category.to_dict() for category in categories]), 200
